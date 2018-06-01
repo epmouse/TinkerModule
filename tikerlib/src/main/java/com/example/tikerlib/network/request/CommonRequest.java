@@ -26,7 +26,9 @@ public class CommonRequest {
         return createPostRequest(url, params, null);
     }
 
-    /**可以带请求头的Post请求
+    /**
+     * 可以带请求头的Post请求
+     *
      * @param url
      * @param params
      * @param headers
@@ -69,6 +71,7 @@ public class CommonRequest {
 
     /**
      * 可以带请求头的Get请求
+     *
      * @param url
      * @param params
      * @param headers
@@ -110,6 +113,20 @@ public class CommonRequest {
         }
         return new Request.Builder().url(urlBuilder.substring(0, urlBuilder.length() - 1)).get().build();
     }
+
+    /**
+     * json上传请求
+     *
+     * @param url
+     * @return
+     */
+    public static Request createUpdateJsonRequest(String url, String json) {
+        StringBuilder urlBuilder = new StringBuilder(url).append("&");
+        RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8")
+                , json==null?"{}":json);
+        return new Request.Builder().url(url).post(requestBody).build();
+    }
+
 
     /**
      * 文件上传请求

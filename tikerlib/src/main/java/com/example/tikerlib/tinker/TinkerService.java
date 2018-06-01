@@ -80,7 +80,7 @@ public class TinkerService extends Service {
         File patchFileDir = new File(mPatchFileDir);
         try {
             if (patchFileDir == null || !patchFileDir.exists()) {
-                patchFileDir.mkdir(); //文件夹不存在则创建
+                patchFileDir.mkdir();
             }
         } catch (Exception e) {
             e.printStackTrace();

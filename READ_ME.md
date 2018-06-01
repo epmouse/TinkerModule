@@ -93,6 +93,27 @@ Annotation processors must be explicitly declared now.  The following dependenci
                 .setDownloadPatchUrl("xx/xx");
 ```
 
+#### 打差量包
+> 打差量包的时候需要设置基线版本的信息，同样在gradle.properties 中设置，设置完记得同步
+
+```
+# tinker版本
+TINKER_VERSION=1.9.1
+# 是否开启tinker
+TINKER_ENABLE=true 
+# 基线apk，打差量包所依赖的版本
+TINKER_OLD_APK_PATH=app-release-0601-10-14-59.apk
+# 基线版本的混淆文件名
+TINKER_APPLY_MAPPING_PATH=app-release-0601-10-14-59-mapping.txt
+# 基线版本的 资源路径名
+TINKER_APPLY_RESOURCE_PATH=app-release-0601-10-14-59-R.txt
+# flavor方式的多渠道打包支持的文件路径
+TINKER_BUILD_FLAVOR_DIRECTORY=app-0601-10-14-59
+# tinkerId
+TINKER_ID="1.0"
+```
+注意在module中已经设置过路径为build文件夹下的bakApk 这里只需要写文件名即可。
+
    
   
    

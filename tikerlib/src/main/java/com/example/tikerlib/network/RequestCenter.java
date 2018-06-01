@@ -9,7 +9,6 @@ import com.example.tikerlib.network.request.RequestParams;
 import com.example.tikerlib.tinker.module.BasePatch;
 
 /**
- * Created by renzhiqiang on 17/4/24.
  *
  * @function 请求发送中心
  */
@@ -18,6 +17,11 @@ public class RequestCenter {
     //根据参数发送所有post请求
     public static void postRequest(String url, RequestParams params, DisposeDataListener listener, Class<?> clazz) {
         CommonOkHttpClient.get(CommonRequest.createGetRequest(url, params), new DisposeDataHandle(listener, clazz));
+    }
+
+    //根据json发送post请求
+    public static void postJsonRequest(String url, String json, DisposeDataListener listener, Class<?> clazz) {
+        CommonOkHttpClient.get(CommonRequest.createUpdateJsonRequest(url, json), new DisposeDataHandle(listener, clazz));
     }
 
 

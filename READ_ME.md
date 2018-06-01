@@ -114,6 +114,166 @@ TINKER_ID="1.0"
 ```
 注意在module中已经设置过路径为build文件夹下的bakApk 这里只需要写文件名即可。
 
-   
+#### 修改tinker默认杀死进程的行为
+> tinker默认更新完插件后，会杀掉app进程，用户体验差。要阻止此行为需要
+重写DefaultTinkerResultService的onPatchResult(PatchResult result) 来修改：
+
+```
+/**
+ * 本类的作用：决定在patch安装完以后的后续操作，默认实现是杀进程
+ */
+public class CustomResultService extends DefaultTinkerResultService {
+    private static final String TAG = "Tinker.SampleResultService";
+
+    //返回patch文件的最终安装结果
+    @Override
+    public void onPatchResult(PatchResult result) {
+        if (result == null) {
+            TinkerLog.e(TAG, "DefaultTinkerResultService received null result!!!!");
+            return;
+        }
+        TinkerLog.i(TAG, "DefaultTinkerResultService received a result:%s ", result.toString());
+
+        //此行代码就是杀死进程操作，可以修改为弹出对话框，让用户选择是否重启应用。
+        TinkerServiceInternals.killTinkerPatchServiceProcess(getApplicationContext());//杀进程
+
+        // if success and newPatch, it is nice to delete the raw file, and restart at once
+        // only main process can load an upgrade patch!
+        if (result.isSuccess) {
+            deleteRawPatchFile(new File(result.rawPatchFilePath));
+        }
+    }
+}
+
+```
+
+>大家知道腾讯的bugly中也有tinker的热修复，它里面默认修改过该行为了，只要在初始化的时候设置
+了提示用户 Beta.canNotifyUserRestart = true;在加载完更新包后就会弹出对话框让用户选择
+
+>需要注意的是虽然bugly中也重写了DefaultTinkerResultService，但是弹窗的逻辑并不在此类中处理
+bugly中重新此类的代码如下：
+
+```
+public class TinkerResultService extends DefaultTinkerResultService {
+    private static final String TAG = "Tinker.TinkerResultService";
+
+    public TinkerResultService() {
+    }
+
+    public void onPatchResult(final PatchResult result) {
+        if (TinkerManager.patchResultListener != null) {
+            TinkerManager.patchResultListener.onPatchResult(result);
+        }
+
+        if (result == null) {
+            TinkerLog.e("Tinker.TinkerResultService", "TinkerResultService received null result!!!!", new Object[0]);
+        } else {
+            TinkerLog.i("Tinker.TinkerResultService", "TinkerResultService receive result: %s", new Object[]{result.toString()});
+            TinkerServiceInternals.killTinkerPatchServiceProcess(this.getApplicationContext());
+            Handler var2 = new Handler(Looper.getMainLooper());
+            var2.post(new Runnable() {
+                public void run() {
+                    if (result.isSuccess) {
+                        TinkerManager.getInstance().onApplySuccess(result.toString());
+                    } else {
+                        TinkerManager.getInstance().onApplyFailure(result.toString());
+                    }
+
+                }
+            });
+            if (result.isSuccess) {
+                this.deleteRawPatchFile(new File(result.rawPatchFilePath));
+                if (this.checkIfNeedKill(result)) {
+                    if (!TinkerManager.isPatchRestartOnScreenOff()) {
+                        return;
+                    }
+
+                    if (TinkerUtils.isBackground()) {
+                        TinkerLog.i("Tinker.TinkerResultService", "it is in background, just restart process", new Object[0]);
+                        this.restartProcess();
+                    } else {
+                        TinkerLog.i("Tinker.TinkerResultService", "tinker wait screen to restart process", new Object[0]);
+                        new ScreenState(this.getApplicationContext(), new IOnScreenOff() {
+                            public void onScreenOff() {
+                                TinkerResultService.this.restartProcess();
+                            }
+                        });
+                    }
+                } else {
+                    TinkerLog.i("Tinker.TinkerResultService", "I have already install the newly patch version!", new Object[0]);
+                }
+            }
+
+        }
+    }
+
+    private void restartProcess() {
+        TinkerLog.i("Tinker.TinkerResultService", "app is background now, i can kill quietly", new Object[0]);
+        Process.killProcess(Process.myPid());
+    }
+}
+
+```
+
+>可以看到，主要是处理了部分回调，然后是判断app是在后台还是在前台，如果app在前台则等待，如果已退回后台，
+检测到该广播就杀死进程，虽然上面的方法名是restartprocess 但是大家一看就知道这里只杀了进程，没有重启。
+
+> 那bugly中弹窗的地方在哪里呢，首先bugly的这部分代码是混淆过的，虽然我找到了弹窗的地方，但是无法理出清晰的逻辑，代码如下：
+
+```
+public class e extends a {
+    protected TextView n;
+
+    public e() {
+    }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.l = com.tencent.bugly.beta.global.e.E.j;
+        View var4 = super.onCreateView(inflater, container, savedInstanceState);
+        if (this.l == 0) {
+            LayoutParams var5 = new LayoutParams(-1, -2);
+            this.n = new TextView(this.a);
+            this.n.setLayoutParams(var5);
+            TextView var10000 = this.n;
+            this.j.getClass();
+            var10000.setTextColor(Color.parseColor("#757575"));
+            this.n.setTextSize(16.0F);
+            this.n.setTag("beta_tip_message");
+            this.i.addView(this.n);
+        } else if (var4 != null) {
+            this.n = (TextView)var4.findViewWithTag("beta_tip_message");
+        }
+
+        try {
+            this.n.setText("检测到当前版本需要重启，是否重启应用？");
+            this.f.setText("更新提示");
+            this.a("取消", new b(8, new Object[]{this}), "重启应用", new b(7, new Object[]{this}));
+        } catch (Exception var6) {
+            if (this.l != 0) {
+                an.e("please confirm your argument: [Beta.tipsDialogLayoutId] is correct", new Object[0]);
+            }
+
+            if (!an.b(var6)) {
+                var6.printStackTrace();
+            }
+        }
+
+        return var4;
+    }
+
+    public boolean a(int var1, KeyEvent var2) {
+        return false;
+    }
+}
+
+```
+> 中间的中文部分就是了。它的位置如下：
+首先是打开studio的jar包列表
+
+![image](https://note.youdao.com/share/?id=12d9848902cb209d2aa6751bd2e8c34b&type=note#/)  
+
+里面ui下的e
+
+![image](https://note.youdao.com/share/?id=a82d2c4a360c7cf3630549eb6e6442f3&type=note#/) 
   
    

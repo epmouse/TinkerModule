@@ -4,6 +4,13 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.example.tikerlib.network.HttpConstant;
+import com.tencent.tinker.lib.listener.DefaultPatchListener;
+import com.tencent.tinker.lib.patch.AbstractPatch;
+import com.tencent.tinker.lib.patch.UpgradePatch;
+import com.tencent.tinker.lib.reporter.DefaultLoadReporter;
+import com.tencent.tinker.lib.reporter.DefaultPatchReporter;
+import com.tencent.tinker.lib.reporter.LoadReporter;
+import com.tencent.tinker.lib.reporter.PatchReporter;
 import com.tencent.tinker.lib.tinker.Tinker;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
 import com.tencent.tinker.loader.app.ApplicationLike;
@@ -45,6 +52,32 @@ public class TinkerManager {
         }
         MultiDex.install(getApplicationContext());//使应用支持分包
         TinkerInstaller.install(mAppLike); //完成tinker初始化
+        isInstalled = true;
+        return this;
+    }
+
+    /**
+     * 完成Tinker的初始化，自定义，拦截安装插件成功方法，处理安装完是否直接杀死进程
+     *
+     * @param applicationLike
+     */
+    public TinkerManager installTinkerSelf(ApplicationLike applicationLike) {
+        mAppLike = applicationLike;
+        if (isInstalled) {
+            return this;
+        }
+        LoadReporter loadReporter = new DefaultLoadReporter(getApplicationContext());
+        PatchReporter patchReporter = new DefaultPatchReporter(getApplicationContext());
+
+        AbstractPatch upgradePatchProcessor = new UpgradePatch();
+
+        TinkerInstaller.install(applicationLike,
+                loadReporter,
+                patchReporter,
+                new DefaultPatchListener(getApplicationContext()),
+                CustomResultService.class,
+                upgradePatchProcessor); //完成Tinker初始化
+
         isInstalled = true;
         return this;
     }

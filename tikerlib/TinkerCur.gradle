@@ -1,11 +1,11 @@
 def bakPath = file("${buildDir}/bakApk/")
 ext {
-    tinkerEnable = true
-    tinkerOldApkPath = "${bakPath}/app-release-0531-17-41-27.apk"
-    tinkerID = "1.0"
-    tinkerApplyMappingPath = "${bakPath}/app-release-0531-17-29-31-mapping.txt"
-    tinkerApplyResourcePath = "${bakPath}/app-release-0531-17-41-27-R.txt"
-//    tinkerBuildFlavorDirectory = "${bakPath}/app-1018-17-32-47"//多渠道配合
+    tinkerEnable = TINKER_ENABLE
+    tinkerOldApkPath = "${bakPath}/$TINKER_OLD_APK_PATH"
+    tinkerID = TINKER_ID
+    tinkerApplyMappingPath = "${bakPath}/$TINKER_APPLY_MAPPING_PATH"
+    tinkerApplyResourcePath = "${bakPath}/$TINKER_APPLY_RESOURCE_PATH"
+    tinkerBuildFlavorDirectory = "${bakPath}/$TINKER_BUILD_FLAVOR_DIRECTORY"//多渠道配合
 }
 
 def buildWithTinker() {
@@ -14,7 +14,6 @@ def buildWithTinker() {
 }
 
 def getOldApkPath() {
-
     return ext.tinkerOldApkPath
 }
 

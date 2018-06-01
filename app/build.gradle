@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply from : "../tikerlib/TinkerCur.gradle"
 def javaVersion = JavaVersion.VERSION_1_7
 
+
 android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
@@ -13,6 +14,11 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+        javaCompileOptions {//处理Annotation processors must be explicitly declared now
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
     }
 
     sourceSets {
@@ -61,6 +67,7 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
     implementation project(':tikerlib')
+    compileOnly ("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
 }
 
 

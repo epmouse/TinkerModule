@@ -62,7 +62,23 @@ public abstract class CustomTinkerLike extends ApplicationLike {
  //生成appilcation时使用
     api ("com.tencent.tinker:tinker-android-lib:${TINKER_VERSION}") { changing = true }
 ```
-   
+  假如在编译的时候报错：
+ ```
+Annotation processors must be explicitly declared now.  The following dependencies on the compile classpath are found to contain annotation processor.  Please add them to the annotationProcessor configuration.
+  - tinker-android-anno-1.9.1.jar (com.tencent.tinker:tinker-android-anno:1.9.1)
+
+```  
+  在app的build.gradle中加入：
+  ```
+ defaultConfig {
+        javaCompileOptions {//处理Annotation processors must be explicitly declared now
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
+    }
+```
+     
      ###### 2、在AndroidManifest.xml 文件中注册生成的application，默认为.tinker.MyTinkerApplication
    
 ##### 二、 当reflectApplication = true 的情况   
@@ -76,7 +92,7 @@ public abstract class CustomTinkerLike extends ApplicationLike {
                 .setUpdateCheckPatchUrl("xx/xx")
                 .setDownloadPatchUrl("xx/xx");
 ```
-   
+
    
   
    

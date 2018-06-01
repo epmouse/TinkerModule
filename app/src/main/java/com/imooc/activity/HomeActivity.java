@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
@@ -43,8 +44,6 @@ public class HomeActivity extends BaseActivity implements OnClickListener {
         //启动后台服务更新
         startAllService();
         initView();
-
-
         mHomeFragment = new HomeFragment();
         mHomeFragment = new HomeFragment();
         fm = getFragmentManager();

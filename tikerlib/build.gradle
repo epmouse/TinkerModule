@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 
+
 android {
     compileSdkVersion 26
     buildToolsVersion "27.0.3"
@@ -12,11 +13,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        javaCompileOptions {//处理Annotation processors must be explicitly declared now
-            annotationProcessorOptions {
-                includeCompileClasspath true
-            }
-        }
+
     }
 
     buildTypes {
@@ -36,12 +33,8 @@ dependencies {
     })
     api 'com.android.support:appcompat-v7:26.1.0'
     //生成appilcation时使用
-    api ("com.tencent.tinker:tinker-android-lib:${TINKER_VERSION}") { changing = true }
-
-    compileOnly ("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
-
+    api ("com.tencent.tinker:tinker-android-lib:$TINKER_VERSION") { changing = true }
     api "com.android.support:multidex:1.0.3"
-
     api 'com.squareup.okhttp3:okhttp:3.3.0' //okttp依赖
 
 

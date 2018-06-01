@@ -1,10 +1,10 @@
-package com.example.tikerlib.tinker;
+package com.imooc.tinker;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.support.multidex.MultiDex;
 
+import com.example.tikerlib.tinker.TinkerManager;
 import com.tencent.tinker.anno.DefaultLifeCycle;
 import com.tencent.tinker.loader.app.ApplicationLike;
 import com.tencent.tinker.loader.shareutil.ShareConstants;

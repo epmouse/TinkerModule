@@ -283,4 +283,5 @@ public class e extends a {
 
 ![image](https://note.youdao.com/share/?id=a82d2c4a360c7cf3630549eb6e6442f3&type=note#/) 
   
-   
+待完善：
+* 由于每个公司接口json格式不同，目前的网络请求都封装在库中，要使用的话需要自己修改库中相应逻辑，此部分需要抽离。   

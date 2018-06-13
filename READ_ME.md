@@ -169,7 +169,7 @@ public class TinkerResultService extends DefaultTinkerResultService {
 
     public void onPatchResult(final PatchResult result) {
         if (TinkerManager.patchResultListener != null) {
-            TinkerManager.patchResultListener.onPatchResult(result);
+            TinkerManager.patchResultListener.onPatchResult(result);//这个在bugly热更新的api中有介绍，自定义接口，由于注册这个接口是靠修改bugly的init方法的，改成多参数的，这个只有使用applike的方式才可以用。
         }
 
         if (result == null) {

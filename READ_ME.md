@@ -283,5 +283,15 @@ public class e extends a {
 
 ![image](https://note.youdao.com/share/?id=a82d2c4a360c7cf3630549eb6e6442f3&type=note#/) 
   
+#### 使用bugly的热更新遇到的坑
+* 上传补丁包失败，提示没有与此匹配的基线版本
+   > 首先看文档中的常见问题：基线版本安装后需要上报数据（也就是启动app）
+   
+   > 如果已确认上报过，请查看log，筛选条件用 CrashReport  里面有打印的tinkerId，如果tinkerId=[] 
+   也就是打印出来的为空，解决方案如下：
+     * 使用反射的方式的，检查.gradle配置文件中的反射是否打开 enableProxyApplication = true
+     * 使用like方式接入的话，查初始化方法   Beta.installTinker(appLike);  这里需要注意的是Like方式的初始化方法是有参数的，传入appLike实例
+
+
 待完善：
 * 由于每个公司接口json格式不同，目前的网络请求都封装在库中，要使用的话需要自己修改库中相应逻辑，此部分需要抽离。   
